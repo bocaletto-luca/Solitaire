@@ -3,21 +3,24 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Klondike Solitaire - Drag & Drop</title>
+  <title>Klondike Solitaire - Final Release</title>
   <style>
-    /* ====================== RESET & GLOBAL ====================== */
+    /* ====================== RESET & GLOBAL STYLES ====================== */
     * {
       box-sizing: border-box;
-      margin: 0; padding: 0;
+      margin: 0; 
+      padding: 0;
     }
     body {
       font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
       background-color: #121212;
       color: #e0e0e0;
       padding: 20px;
-      display: flex; flex-direction: column;
+      display: flex; 
+      flex-direction: column;
       min-height: 100vh;
       text-align: center;
+      overflow-x: hidden; /* Rimuove scrollbar orizzontale indesiderata */
     }
     h1 { margin-bottom: 10px; }
     button {
@@ -56,10 +59,11 @@
     .pile-title {
       font-size: 0.75rem;
       position: absolute;
-      top: 2px; left: 2px;
+      top: 2px; 
+      left: 2px;
       color: #ccc;
     }
-    /* Foundation area */
+    /* Foundation area: 4 pile-locations */
     #foundations {
       display: flex;
       justify-content: space-between;
@@ -80,10 +84,10 @@
       width: 120px;
       min-height: 300px;
       position: relative;
-      /* Abilitare il drop anche sull'area vuota */
-      overflow-y: auto;
+      /* Imposto overflow visible per evitare barre di scorrimento indesiderate */
+      overflow: visible;
     }
-
+    
     /* ======================= CARD STYLING ======================= */
     .card {
       width: 100px;
@@ -97,7 +101,7 @@
       justify-content: space-between;
       padding: 4px;
       position: absolute;
-      left: 50%; 
+      left: 50%;
       transform: translateX(-50%);
       transition: transform 0.3s ease;
       user-select: none;
@@ -106,10 +110,12 @@
       background-color: #444;
       border: 1px solid #222;
     }
-    .card.red { color: red; }
-    /* Durante il drag, abbassa l'opacità */
+    .card.red {
+      color: red;
+    }
+    /* Durante il drag la carta assume opacità ridotta */
     .dragging { opacity: 0.6; }
-    /* Evidenzia area drop */
+    /* Evidenzia l’area su cui si sta facendo drop */
     .drag-over { border: 2px dashed #FFD700; }
     
     /* ====================== HELP MODAL ====================== */
@@ -117,8 +123,10 @@
       display: none;
       position: fixed;
       z-index: 10000;
-      left: 0; top: 0;
-      width: 100%; height: 100%;
+      left: 0; 
+      top: 0;
+      width: 100%;
+      height: 100%;
       overflow: auto;
       background-color: rgba(0,0,0,0.8);
       padding: 20px;
@@ -149,17 +157,28 @@
       .pile-container { width: 80px; height: 112px; }
       .tableau-pile { width: 90px; min-height: 250px; }
     }
+    
+    /* ====================== FOOTER ====================== */
+    footer {
+      margin-top: 20px;
+      padding: 10px 0;
+      background-color: #1f1f1f;
+      font-size: 0.9rem;
+      color: #ccc;
+    }
   </style>
 </head>
 <body>
+  <!-- HEADER -->
   <header>
     <h1>Klondike Solitaire</h1>
     <button id="helpBtn">Help</button>
     <button id="newGameBtn" style="background-color:#007BFF;">New Game</button>
   </header>
   
+  <!-- GAME CONTAINER -->
   <div id="game-container">
-    <!-- Top area -->
+    <!-- Top area: Stock, Waste, Foundations -->
     <div id="top-area">
       <div id="stock" class="pile-container">
         <div class="pile-title">Stock</div>
@@ -183,11 +202,17 @@
       </div>
     </div>
     
-    <!-- Tableau -->
+    <!-- Tableau: 7 piles -->
     <div id="tableau"></div>
     
+    <!-- Message area -->
     <div id="message" style="margin-top: 10px; font-size: 1.1rem;"></div>
   </div>
+  
+  <!-- FOOTER -->
+  <footer>
+    © 2025 Bocaletto Luca
+  </footer>
   
   <!-- HELP MODAL -->
   <div id="helpModal" class="modal">
@@ -195,45 +220,44 @@
       <span class="close" id="closeHelp">&times;</span>
       <h2>How to Play Klondike Solitaire</h2>
       <p>
-        <strong>Goal:</strong> Build up all four Foundation piles from Ace to King in each suit.<br><br>
+        <strong>Goal:</strong> Build all four Foundation piles from Ace to King in each suit.<br><br>
         <strong>Setup:</strong><br>
-        - The deck is shuffled and dealt into 7 tableau piles.<br>
-          The first pile gets 1 card (face up); the second gets 2 cards (only the bottom card face up); and so on.<br>
+        - The deck is shuffled and dealt into 7 tableau piles. The first pile gets 1 card (face up); the second gets 2 cards (only the bottom card is face up); and so on.<br>
         - The remaining cards form the Stock (face down). The Waste is initially empty.<br>
-        - Four empty Foundation piles are available for each suit.<br><br>
+        - There are four empty Foundation piles (one per suit).<br><br>
         <strong>Gameplay:</strong><br>
         - Click the Stock to deal one card from the Stock to the Waste.<br>
-        - Drag and drop a card (or a sequence of cards in the tableau) from the Waste or Tableau to a valid destination:<br>
-          • Tableau: Build in descending order with alternating colors. An empty tableau pile accepts only a King (with its sequence).<br>
-          • Foundation: Build from Ace up to King for the same suit.<br>
-        - When you remove a card from a tableau pile, the new top card is flipped automatically.<br><br>
+        - Drag and drop a card (or a sequence from the tableau) from the Waste or a Tableau pile to a valid destination:<br>
+          • In the Tableau, build cards in descending order while alternating colors (e.g. red 7 on black 8). An empty tableau accepts only a King (with its sequence).<br>
+          • In the Foundations, build up starting from an Ace in the same suit (A,2,3, …,K).<br>
+        - When you remove a card from a Tableau pile, the new top card is automatically flipped face up.<br><br>
         Enjoy your game!
       </p>
     </div>
   </div>
   
-  <!-- ====================== JAVASCRIPT ====================== -->
+  <!-- ====================== JAVASCRIPT (LOGICA DI GIOCO E DRAG & DROP) ====================== -->
   <script>
     // -------------------- GLOBAL VARIABLES & GAME STATE --------------------
     const SUITS = ["hearts", "diamonds", "clubs", "spades"];
-    const RANKS = ["A","2","3","4","5","6","7","8","9","10","J","Q","K"];
-    
+    const RANKS = ["A", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K"];
     let deck = [];
     let stock = [];
     let waste = [];
-    let tableau = [[],[],[],[],[],[],[]];
+    let tableau = [[], [], [], [], [], [], []]; // 7 piles
     let foundations = { hearts: [], diamonds: [], clubs: [], spades: [] };
     
-    // -------------------- INITIALIZE GAME --------------------
+    // -------------------- INITIAL SETUP --------------------
     function initGame() {
+      // Resetta tutte le variabili di gioco
       deck = [];
       stock = [];
       waste = [];
-      tableau = [[],[],[],[],[],[],[]];
+      tableau = [[], [], [], [], [], [], []];
       foundations = { hearts: [], diamonds: [], clubs: [], spades: [] };
       document.getElementById("message").textContent = "";
       
-      // Creazione del mazzo
+      // Crea mazzo completo (52 carte)
       for (let suit of SUITS) {
         for (let rank of RANKS) {
           deck.push({
@@ -246,7 +270,7 @@
       }
       shuffle(deck);
       
-      // Distribuzione nel tableau: la pila i riceve i+1 carte, solo l'ultima è a faccia in su.
+      // Distribuzione nel tableau: la i-esima pila riceve i+1 carte, solo l'ultima viene girata
       for (let i = 0; i < 7; i++) {
         for (let j = 0; j <= i; j++) {
           let card = deck.pop();
@@ -254,13 +278,13 @@
           tableau[i].push(card);
         }
       }
-      // Le carte non distribuite entrano nello Stock
+      // Le carte rimanenti compongono lo Stock
       stock = deck.slice();
-      deck = [];
+      deck = []; // Svuota il mazzo
       renderGame();
     }
     
-    // Fisher–Yates Shuffle
+    // Fisher-Yates Shuffle
     function shuffle(array) {
       for (let i = array.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
@@ -276,13 +300,14 @@
       renderTableau();
     }
     
+    // Render dello Stock: se non vuoto, mostra il retro della carta.
     function renderStock() {
       const stockDiv = document.getElementById("stock");
       stockDiv.innerHTML = "";
       if (stock.length > 0) {
         let backCard = document.createElement("div");
         backCard.className = "card back";
-        // Abilitiamo il click per girare una carta dal Stock
+        // Cliccando sul retro, si gira una carta dal Stock e la si manda nel Waste
         backCard.onclick = () => {
           if (stock.length > 0) {
             let card = stock.pop();
@@ -295,18 +320,19 @@
       }
     }
     
+    // Render della Waste: mostra solo l'ultima carta (visibile).
     function renderWaste() {
       const wasteDiv = document.getElementById("waste");
       wasteDiv.innerHTML = "";
       if (waste.length > 0) {
         let card = waste[waste.length - 1];
         let cardDiv = createCardElement(card, "waste", waste.length - 1);
-        // Abilitiamo il drop anche sul Waste (per spostamenti eventuali)
         enableDrop(wasteDiv, "waste", null);
         wasteDiv.appendChild(cardDiv);
       }
     }
     
+    // Render delle Fondazioni: una per ogni seme.
     function renderFoundations() {
       for (let suit of SUITS) {
         const foundationDiv = document.getElementById("foundation-" + suit);
@@ -317,11 +343,12 @@
           let cardDiv = createCardElement(topCard, "foundation", pile.length - 1);
           foundationDiv.appendChild(cardDiv);
         }
-        // Abilitiamo il drop sulle fondazioni
+        // Abilita il drop sulle fondazioni per spostare le carte
         enableDrop(foundationDiv, "foundation", suit);
       }
     }
     
+    // Render del Tableau: 7 colonne che accumulano le carte con un offset verticale.
     function renderTableau() {
       const tableauDiv = document.getElementById("tableau");
       tableauDiv.innerHTML = "";
@@ -329,10 +356,11 @@
         let pileDiv = document.createElement("div");
         pileDiv.className = "tableau-pile";
         pileDiv.dataset.index = i;
+        // Abilita il drop sul Tableau; destType "tableau" e destId = indice della pila
         enableDrop(pileDiv, "tableau", i);
         tableau[i].forEach((card, index) => {
           let cardDiv = createCardElement(card, "tableau-" + i, index);
-          // Posiziona le carte con un offset verticale (30px per le carte visibili, 15 per quelle coperte)
+          // Applica un offset verticale: 30px se la carta è visibile, 15px se coperta
           let offset = card.faceUp ? 30 : 15;
           cardDiv.style.top = (index * offset) + "px";
           pileDiv.appendChild(cardDiv);
@@ -341,17 +369,22 @@
       }
     }
     
-    // -------------------- CARD CREATION & DRAG & DROP --------------------
+    // -------------------- CARD CREATION & DRAG & DROP HANDLERS --------------------
+    // Crea l'elemento DOM per una carta.
+    // sourceType identifica la fonte (es: "waste", "tableau-3", "foundation")
+    // cardIndex indica la posizione all'interno della fonte.
     function createCardElement(card, sourceType, cardIndex) {
       let cardDiv = document.createElement("div");
       cardDiv.className = "card";
+      
       if (!card.faceUp) {
         cardDiv.classList.add("back");
       } else {
         cardDiv.textContent = card.rank + getSuitSymbol(card.suit);
         if (card.color === "red") cardDiv.classList.add("red");
       }
-      // Abilita "drag" se la carta è visibile e proviene da Waste o Tableau
+      
+      // Abilita il drag per le carte visibili provenienti da Waste o Tableau.
       if (card.faceUp && (sourceType.startsWith("waste") || sourceType.startsWith("tableau"))) {
         cardDiv.draggable = true;
         cardDiv.addEventListener("dragstart", (e) => {
@@ -365,6 +398,7 @@
       return cardDiv;
     }
     
+    // Restituisce il simbolo Unicode corrispondente al seme.
     function getSuitSymbol(suit) {
       switch(suit) {
         case "hearts": return "♥";
@@ -375,7 +409,8 @@
       }
     }
     
-    // Abilita il drop su un elemento (fondazione, tableau o waste)
+    // Abilita il drop su un elemento. destType può essere "foundation", "tableau" o "waste".
+    // destId identifica il riferimento a destinazione (ad es. per Foundation, il seme; per Tableau, l'indice).
     function enableDrop(element, destType, destId) {
       element.addEventListener("dragover", (e) => {
         e.preventDefault();
@@ -388,107 +423,112 @@
         e.preventDefault();
         element.classList.remove("drag-over");
         let data = JSON.parse(e.dataTransfer.getData("text/plain"));
+        // Gestione del drop in base alla destinazione
         handleDrop(data, destType, destId);
       });
     }
     
-    // Gestione del drop: in base alla destinazione, se è "foundation" o "tableau"
+    // Gestisce il drop della carta in una destinazione specifica
     function handleDrop(data, destType, destId) {
-      // Per semplicità, rimuoviamo eventuale selezione (non usata intensivamente con il DnD)
+      // Se la destinazione è la Fondazione
       if (destType === "foundation") {
         moveCardToFoundation(data, destId);
-      } else if (destType === "tableau") {
+      } 
+      // Se la destinazione è un Tableau
+      else if (destType === "tableau") {
         moveCardToTableau(data, destId);
-      } else if (destType === "waste") {
-        // Anche la waste può essere destinazione (molto raro)
-        moveCardToWaste(data);
+      } 
+      // È possibile gestire anche il drop sulla Waste se necessario (qui non implementato)
+      else if (destType === "waste") {
+        // (Non implementato)
       }
     }
     
     // -------------------- MOVE HANDLERS --------------------
-    // Sposta una carta dalla fonte alla Fondazione
+    // Sposta una carta dalla fonte (Waste o Tableau) alla Fondazione
     function moveCardToFoundation(data, foundationSuit) {
       let card;
+      // Se la carta proviene dalla Waste
       if (data.source === "waste") {
         if (waste.length === 0) return;
         card = waste[waste.length - 1];
-      } else if (data.source.startsWith("tableau-")) {
+      }
+      // Se la carta proviene dal Tableau
+      else if (data.source.startsWith("tableau-")) {
         let pileIndex = parseInt(data.source.split("-")[1]);
         if (tableau[pileIndex].length === 0) return;
-        // Solo la carta in cima al tableau può essere spostata
+        // Solo l'ultima carta del Tableau può essere spostata
         card = tableau[pileIndex][tableau[pileIndex].length - 1];
       }
+      // Controlla se la mossa è legale per la fondazione
       if (!canMoveToFoundation(card, foundationSuit)) {
         document.getElementById("message").textContent = "Illegal move to Foundation.";
         return;
       }
-      // Rimuovi dalla fonte
+      // Rimuove la carta dalla fonte
       if (data.source === "waste") {
         waste.pop();
       } else if (data.source.startsWith("tableau-")) {
         let pileIndex = parseInt(data.source.split("-")[1]);
         tableau[pileIndex].pop();
+        // Se la pila del Tableau non è vuota, gira la nuova carta in cima
         if (tableau[pileIndex].length > 0) {
           let topCard = tableau[pileIndex][tableau[pileIndex].length - 1];
           topCard.faceUp = true;
         }
       }
+      // Aggiunge la carta nella Fondazione relativa al seme
       foundations[foundationSuit].push(card);
       document.getElementById("message").textContent = "Moved card to Foundation.";
       renderGame();
       checkWinCondition();
     }
     
-    // Sposta una carta (o una sequenza, nel caso di tableau) alla pila del Tableau di destinazione
+    // Sposta una carta (o l'ultima carta del Tableau) verso una pila del Tableau
     function moveCardToTableau(data, destIndex) {
-      let movingCards = [];
+      let movingCard;
       if (data.source === "waste") {
         if (waste.length === 0) return;
-        movingCards.push(waste[waste.length - 1]);
-      } else if (data.source.startsWith("tableau-")) {
-        let sourcePileIndex = parseInt(data.source.split("-")[1]);
-        movingCards = tableau[sourcePileIndex].slice();
-        // Per la semplificazione, spostiamo solo l'unica carta (quella in cima)
-        let cardCandidate = movingCards[movingCards.length - 1];
-        movingCards = [ cardCandidate ];
+        movingCard = waste[waste.length - 1];
       }
-      if (!canMoveToTableau(movingCards[0], destIndex)) {
+      else if (data.source.startsWith("tableau-")) {
+        let sourceIndex = parseInt(data.source.split("-")[1]);
+        if (tableau[sourceIndex].length === 0) return;
+        movingCard = tableau[sourceIndex][tableau[sourceIndex].length - 1];
+      }
+      
+      if (!canMoveToTableau(movingCard, destIndex)) {
         document.getElementById("message").textContent = "Illegal move to Tableau.";
         return;
       }
-      // Rimuovi la carta dalla fonte
+      
+      // Rimuove la carta dalla fonte
       if (data.source === "waste") {
         waste.pop();
       } else if (data.source.startsWith("tableau-")) {
-        let sourcePileIndex = parseInt(data.source.split("-")[1]);
-        tableau[sourcePileIndex].pop();
-        if (tableau[sourcePileIndex].length > 0) {
-          let topCard = tableau[sourcePileIndex][tableau[sourcePileIndex].length - 1];
+        let sourceIndex = parseInt(data.source.split("-")[1]);
+        tableau[sourceIndex].pop();
+        if (tableau[sourceIndex].length > 0) {
+          let topCard = tableau[sourceIndex][tableau[sourceIndex].length - 1];
           topCard.faceUp = true;
         }
       }
-      // Aggiungi la carta al Tableau di destinazione
-      tableau[destIndex].push(movingCards[0]);
+      // Aggiunge la carta alla pila del Tableau di destinazione
+      tableau[destIndex].push(movingCard);
       document.getElementById("message").textContent = "Moved card to Tableau.";
       renderGame();
     }
     
-    // (Opzionale) Sposta una carta alla Waste – non è una mossa comune, ma lo teniamo per completezza.
-    function moveCardToWaste(data) {
-      // In questo esempio, non implementiamo spostamenti verso la Waste.
-      document.getElementById("message").textContent = "Illegal move.";
-    }
-    
-    // Verifica se una carta può essere spostata sulla Foundation
+    // Verifica se una carta può essere spostata in una Fondazione
     function canMoveToFoundation(card, foundationSuit) {
       if (card.suit !== foundationSuit) return false;
       let pile = foundations[foundationSuit];
-      let value = getCardValue(card.rank);
+      let cardValue = getCardValue(card.rank);
       if (pile.length === 0) {
-        return value === 1; // solo l'Ace
+        return cardValue === 1;  // Solo un Ace può iniziare
       } else {
         let topCard = pile[pile.length - 1];
-        return getCardValue(topCard.rank) + 1 === value;
+        return getCardValue(topCard.rank) + 1 === cardValue;
       }
     }
     
@@ -496,15 +536,17 @@
     function canMoveToTableau(card, destIndex) {
       let destPile = tableau[destIndex];
       if (destPile.length === 0) {
-        // Solo un Re può essere fondato su un tableau vuoto
+        // Solo un Re può essere spostato su un Tableau vuoto
         return getCardValue(card.rank) === 13;
       } else {
         let target = destPile[destPile.length - 1];
+        // Verifica che la carta possa essere posizionata in ordine decrescente con colori alterni
         return (getCardValue(target.rank) === getCardValue(card.rank) + 1 &&
                 target.color !== card.color);
       }
     }
     
+    // Restituisce il valore numerico di una carta
     function getCardValue(rank) {
       if (rank === "A") return 1;
       if (rank === "J") return 11;
@@ -515,20 +557,18 @@
     
     // -------------------- WIN CONDITION --------------------
     function checkWinCondition() {
-      let totalFoundationCards = foundations.hearts.length + foundations.diamonds.length +
-                                 foundations.clubs.length + foundations.spades.length;
-      if (totalFoundationCards === 52) {
+      // Vince se tutte le 52 carte sono nelle Fondazioni
+      let total = foundations.hearts.length + foundations.diamonds.length +
+                  foundations.clubs.length + foundations.spades.length;
+      if (total === 52) {
         document.getElementById("message").textContent = "Congratulations! You win!";
       }
     }
     
     // -------------------- EVENT HANDLERS --------------------
-    // New Game button
     document.getElementById("newGameBtn").onclick = function() {
       initGame();
     };
-    
-    // Help Modal
     document.getElementById("helpBtn").onclick = function() {
       document.getElementById("helpModal").style.display = "block";
     };
@@ -543,6 +583,9 @@
     
     // -------------------- INITIALIZE GAME --------------------
     initGame();
+    
+    // -------------------- EVENT HANDLING FOR DROP DESTINATIONS --------------------
+    // L'uso di enableDrop() nelle funzioni renderFoundations() e renderTableau() abilita i gestori necessari.
   </script>
 </body>
 </html>
