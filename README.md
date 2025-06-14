@@ -5,6 +5,8 @@
 [![Made with CSS3](https://img.shields.io/badge/Made%20with-CSS3-1572B6?logo=css3)](https://www.w3.org/Style/CSS/)
 [![Made with JavaScript](https://img.shields.io/badge/Made%20with-JavaScript-F7DF1E?logo=javascript)](https://developer.mozilla.org/docs/Web/JavaScript)
 
+[![Test Online](https://img.shields.io/badge/Test%20Online-Click%20Here-brightgreen?style=for-the-badge)](https://bocaletto-luca.github.io/Solitaire/)
+
 ## Overview
 
 **Klondike Solitaire – Final Release** is a modern, fully responsive web adaptation of the classic Klondike Solitaire game. This project faithfully implements the official solitaire rules—including proper deck shuffling, dealing into tableau piles (with only the last card face-up), Stock, Waste, and four Foundation piles—with the added benefit of native drag & drop support for an intuitive moving of individual cards or entire sequences.  
