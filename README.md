@@ -62,3 +62,5 @@ This project is licensed under the GPL License.
 Developed by **Bocaletto Luca**
 
 Enjoy playing Klondike Solitaire!
+
+#### License: GPLv3
